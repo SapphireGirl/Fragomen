@@ -2,10 +2,7 @@ using Fragomen.UserAPI.Interfaces;
 using Fragomen.UserAPI.Repositories;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,10 +13,22 @@ var userDbConnectionString = builder.Configuration.GetConnectionString("UserAPIC
 builder.Services.AddTransient<IDbConnection>(sp => new SqlConnection(userDbConnectionString));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+// Add CORS policy for local development (allow the client origin)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevCorsPolicy", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:53514") // adjust port if your client runs on a different port
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 var app = builder.Build();
 
 app.UseDeveloperExceptionPage();
@@ -29,6 +38,9 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "User.API v1");
     c.RoutePrefix = "swagger";
 });
+
+// Enable CORS using the named policy
+app.UseCors("DevCorsPolicy");
 
 app.UseAuthorization();
 app.MapControllers();

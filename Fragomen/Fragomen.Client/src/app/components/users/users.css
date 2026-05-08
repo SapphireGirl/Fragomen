@@ -1,0 +1,53 @@
+.users-title {
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+}
+
+.users-container {
+  width: 100%;
+  max-width: 960px; /* optional: constrain content width */
+  margin: 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.user-panel {
+  width: 100%;
+  box-shadow: none; /* optional: remove extra elevation */
+  margin-bottom: 8px;
+}
+
+.user-details {
+  padding: 12px 0;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.loading,
+.empty,
+.error {
+  padding: 12px 0;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.user-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 8px;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.user-id, .user-email {
+  font-size: 0.875rem;
+  color: rgba(0,0,0,0.6);
+}
+
+.empty, .error {
+  padding: 16px;
+  color: rgba(0,0,0,0.7);
+}

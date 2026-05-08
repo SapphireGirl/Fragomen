@@ -1,20 +1,14 @@
 import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { MatGridListModule } from '@angular/material/grid-list';
 import { AppRoutingModule } from './app-routing-module';
-import { App } from './app';
 
 @NgModule({
-  declarations: [
-    App
-  ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    MatGridListModule
   ],
-  providers: [
-    provideBrowserGlobalErrorListeners()
-  ],
-  bootstrap: [App]
+  providers: [provideBrowserGlobalErrorListeners()],
 })
-export class AppModule { }
+export class AppModule {}
