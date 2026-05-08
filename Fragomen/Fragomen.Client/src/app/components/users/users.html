@@ -1,0 +1,30 @@
+<p class="users-title">Users</p>
+
+<div class="users-container">
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+  <div *ngIf="isLoading" class="loading">Loading users...</div>
+
+  <div *ngIf="!isLoading && users.length === 0" class="empty">
+    No users found.
+  </div>
+
+  <mat-accordion *ngIf="!isLoading && users.length > 0" displayMode="flat">
+    <mat-expansion-panel *ngFor="let user of users" class="user-panel">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{ user.firstName }} {{ user.lastName }}
+        </mat-panel-title>
+        <mat-panel-description>
+          {{ user.country }}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="user-details">
+        <p><strong>ID:</strong> {{ user.id }}</p>
+        <p *ngIf="user.email"><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Country:</strong> {{ user.country }}</p>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>

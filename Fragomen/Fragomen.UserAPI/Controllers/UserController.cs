@@ -5,10 +5,9 @@ using Fragomen.UserAPI.Interfaces;
 namespace Fragomen.UserAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]/[action]")]
+    [Route("[controller]")]
     public class UserController : ControllerBase
     {
-
         private readonly ILogger<UserController> _logger;
         private readonly IUserRepository _userRepository;
 
@@ -18,8 +17,7 @@ namespace Fragomen.UserAPI.Controllers
             _userRepository = userRepository;
         }
 
-        [HttpGet("GetAllUsers", Name = "GetAllUsers")]
-        [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
+        [HttpGet("GetAllUsers")]
         public async Task<IEnumerable<User>> GetAllUsers()
         {
             return await _userRepository.GetAllUsers();

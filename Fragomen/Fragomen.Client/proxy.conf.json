@@ -1,0 +1,8 @@
+{
+  "/User": {
+    "target": "http://localhost:5041",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}
