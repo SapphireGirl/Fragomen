@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 // - Managed Identity (when deployed to Azure)
 // - Azure CLI (for local development)
 // - Visual Studio (for local development)
-var keyVaultName = builder.Configuration["KeyVaultName"];
+var keyVaultName = builder.Configuration["JustineAzureKeyVault"];
 if (!string.IsNullOrEmpty(keyVaultName))
 {
     var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
