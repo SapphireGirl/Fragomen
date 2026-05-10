@@ -19,4 +19,20 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
   </ItemGroup>
 
+
+	<Target Name="BuildAngular" BeforeTargets="Build;Publish">
+		<Exec WorkingDirectory="..\Fragomen.Client" Command="npm install" />
+		<Exec WorkingDirectory="..\Fragomen.Client" Command="npm run build" />
+
+		<RemoveDir Directories="wwwroot" Condition="Exists('wwwroot')" />
+		<MakeDir Directories="wwwroot" />
+
+		<ItemGroup>
+			<AngularDistFiles Include="..\Fragomen.Client\dist\Fragomen.Client\browser\**\*.*" />
+		</ItemGroup>
+
+		<Copy
+		  SourceFiles="@(AngularDistFiles)"
+		  DestinationFiles="@(AngularDistFiles->'wwwroot\%(RecursiveDir)%(Filename)%(Extension)')" />
+	</Target>
 </Project>

@@ -361,3 +361,30 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Angular build output
+Fragomen/Fragomen.Client/dist/
+
+# API generated SPA host content
+Fragomen/Fragomen.UserAPI/wwwroot/
+
+# .NET build output
+Fragomen/Fragomen.UserAPI/bin/
+Fragomen/Fragomen.UserAPI/obj/
+
+# Optional: if you want all project bin/obj folders ignored repo-wide
+**/bin/
+**/obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Node
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
