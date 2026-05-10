@@ -2,7 +2,6 @@ using Fragomen.UserAPI.Interfaces;
 using Fragomen.UserAPI.Repositories;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using System.Reflection;
 using Azure.Identity;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 
@@ -60,8 +59,13 @@ app.UseSwaggerUI(c =>
 // Enable CORS using the named policy
 app.UseCors("DevCorsPolicy");
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapFallbackToFile("index.html");
 
 app.Run();
 
