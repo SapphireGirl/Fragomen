@@ -1,11 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
-using Fragomen.UserAPI.Models;
 using Fragomen.UserAPI.Interfaces;
+using Fragomen.UserAPI.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Fragomen.UserAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
@@ -17,6 +19,7 @@ namespace Fragomen.UserAPI.Controllers
             _userRepository = userRepository;
         }
 
+        [AllowAnonymous]
         [HttpGet("GetAllUsers")]
         public async Task<IEnumerable<User>> GetAllUsers()
         {

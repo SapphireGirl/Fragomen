@@ -33,7 +33,7 @@ export class Users implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const url = '/User/GetAllUsers';
+    const url = '/api/User/GetAllUsers';
 
     this.http.get<User[]>(url).subscribe({
       next: (users: User[]): void => {
