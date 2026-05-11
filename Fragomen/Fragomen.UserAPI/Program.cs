@@ -1,11 +1,46 @@
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
 using Fragomen.UserAPI.Interfaces;
 using Fragomen.UserAPI.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 using System.Data;
-using Azure.Identity;
-using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Microsoft.OpenApi.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "User.API", Version = "v1" });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter: Bearer {your JWT token}"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 // Add Azure Key Vault configuration provider
 // This will load secrets from Key Vault and override configuration values
@@ -15,7 +50,7 @@ var builder = WebApplication.CreateBuilder(args);
 // - Visual Studio (for local development)
 
 var keyVaultName = builder.Configuration["KeyVaultName"];
-if (!string.IsNullOrEmpty(keyVaultName))
+if (!builder.Environment.IsDevelopment() && !string.IsNullOrEmpty(keyVaultName))
 {
     var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
     builder.Configuration.AddAzureKeyVault(
@@ -44,9 +79,32 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = builder.Configuration["Authentication:Authority"];
+        options.Audience = builder.Configuration["Authentication:Audience"];
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiScope", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("scp", "access_as_user");
+    });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 app.UseDeveloperExceptionPage();
@@ -63,6 +121,7 @@ app.UseCors("DevCorsPolicy");
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
