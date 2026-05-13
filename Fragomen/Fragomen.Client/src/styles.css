@@ -1,1 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
+/* Global styles.css */
+.mat-expansion-panel.accordion-border {
+  border: 2px solid hotpink !important;
+  border-radius: 4px;
+}
