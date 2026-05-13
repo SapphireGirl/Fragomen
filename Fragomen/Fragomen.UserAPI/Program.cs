@@ -5,9 +5,8 @@ using Fragomen.UserAPI.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
-using System.Data;
 using Microsoft.OpenApi.Models;
-
+using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,7 +71,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy("DevCorsPolicy", policy =>
     {
         policy
-            .WithOrigins("http://localhost:53514") // adjust port if your client runs on a different port
+            .WithOrigins("http://localhost:53514",
+                         "https://fragomen-hchrakawbubudph6.centralus-01.azurewebsites.net",
+                         "http://localhost:5041") 
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -107,7 +108,11 @@ builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
 
-app.UseDeveloperExceptionPage();
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -125,6 +130,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+// For Angular client-side routing
 app.MapFallbackToFile("index.html");
 
 app.Run();
