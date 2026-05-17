@@ -3,7 +3,6 @@ using Fragomen.UserAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using System.Collections.Generic;
 
 namespace Fragomen.UserAPI.Controllers
 {

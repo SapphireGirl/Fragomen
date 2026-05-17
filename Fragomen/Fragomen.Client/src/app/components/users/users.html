@@ -1,32 +1,35 @@
 <h1 class="users-page-title">Users</h1>
 
-<div class="users-container">
-  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+<button (click)="goToCase()">
+  Go to Case</button>
 
-  <div *ngIf="isLoading" class="loading">Loading users...</div>
+  <div class="users-container">
+    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
 
-  <div *ngIf="!isLoading && users.length === 0" class="empty">
-    No users found.
+    <div *ngIf="isLoading" class="loading">Loading users...</div>
+
+    <div *ngIf="!isLoading && users.length === 0" class="empty">
+      No users found.
+    </div>
+
+    <mat-accordion *ngIf="!isLoading && users.length > 0" displayMode="flat" class="accordian-border">
+      <mat-expansion-panel *ngFor="let user of users; let i=index"
+                           class="user-panel"
+                           [class.accordian-border]="user">
+        <mat-expansion-panel-header class="accordian-border">
+          <mat-panel-title>
+            {{ user.firstName }} {{ user.lastName }}
+          </mat-panel-title>
+          <mat-panel-description>
+            {{ user.country }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="user-details">
+          <p><strong>ID:</strong> {{ user.id }}</p>
+          <p *ngIf="user.email"><strong>Email:</strong> {{ user.email }}</p>
+          <p><strong>Country:</strong> {{ user.country }}</p>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
-
-  <mat-accordion *ngIf="!isLoading && users.length > 0" displayMode="flat" class="accordian-border">
-    <mat-expansion-panel *ngFor="let user of users; let i=index"
-                         class="user-panel"
-                         [class.accordian-border]="user">
-      <mat-expansion-panel-header class="accordian-border">
-        <mat-panel-title>
-          {{ user.firstName }} {{ user.lastName }}
-        </mat-panel-title>
-        <mat-panel-description>
-          {{ user.country }}
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-
-      <div class="user-details">
-        <p><strong>ID:</strong> {{ user.id }}</p>
-        <p *ngIf="user.email"><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>Country:</strong> {{ user.country }}</p>
-      </div>
-    </mat-expansion-panel>
-  </mat-accordion>
-</div>

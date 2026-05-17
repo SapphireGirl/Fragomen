@@ -1,0 +1,64 @@
+<!--<h1 class="parties-page-title">party and partys</h1>
+
+<div *ngIf="isLoading" class="text-center">Loading...</div>
+<div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+<ng-container *ngIf="parties && parties.length > 0">
+
+  <mat-accordion multi>
+    <mat-expansion-panel *ngFor="let p of parties; trackBy: trackByPartyId">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{ p.displayName || p.organizationName || (p.givenName + ' ' + p.familyName) }}
+        </mat-panel-title>
+        <mat-panel-description>
+          {{ p.email || p.phone || '' }}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="party-meta">
+        <div><strong>Type:</strong> {{ p.partyType }}</div>
+        <div *ngIf="p.city || p.stateProvince"> <strong>Location:</strong> {{ p.city }}{{ p.city && p.stateProvince ? ', ' : '' }}{{ p.stateProvince }}</div>
+        <div><strong>Created:</strong> {{ p.createdAt | date:'mediumDate' }}</div>
+      </div>
+
+      <mat-list>
+        <h3 mat-subheader>Cases</h3>
+
+        <mat-list-item *ngFor="let cp of p.caseParties; trackBy: trackByCasePartyId">
+          <div mat-line class="case-line">
+            <a (click)="openCase(cp.caseId)" class="case-link">{{ cp.case?.caseNumber || 'Case #' + cp.caseId }}</a>
+            <span class="case-title"> — {{ cp.case?.caseTitle || 'Untitled' }}</span>
+          </div>
+
+          <div mat-line class="secondary">
+            <span *ngIf="cp.role"><strong>Role:</strong> {{ cp.role }}</span>
+            <span *ngIf="cp.representationStartDate"> • <strong>From:</strong> {{ cp.representationStartDate | date:'shortDate' }}</span>
+            <span *ngIf="cp.representationEndDate"> • <strong>To:</strong> {{ cp.representationEndDate | date:'shortDate' }}</span>
+            <span class="badges">
+              <mat-chip-set>
+                <mat-chip *ngIf="cp.isPrimaryContact">Primary</mat-chip>
+                <mat-chip *ngIf="cp.isClient">Client</mat-chip>
+                <mat-chip *ngIf="cp.isAdverse">Adverse</mat-chip>
+              </mat-chip-set>
+            </span>
+          </div>
+
+          <button mat-icon-button matTooltip="Open case" (click)="openCase(cp.caseId)">
+            <mat-icon>open_in_new</mat-icon>
+          </button>
+        </mat-list-item>
+
+        <mat-list-item *ngIf="!p.caseParties || p.caseParties.length === 0">
+          <div mat-line>No cases for this party</div>
+        </mat-list-item>
+      </mat-list>
+
+      <mat-action-row>
+        <button mat-stroked-button color="primary" (click)="editParty(p)">Edit Party</button>
+        <button mat-flat-button color="accent" (click)="addCaseToParty(p)">Add Case</button>
+      </mat-action-row>
+    </mat-expansion-panel>
+  </mat-accordion>
+</ng-container>-->
+
