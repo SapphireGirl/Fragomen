@@ -1,0 +1,119 @@
+<h1 class="cases-page-title">Case</h1>
+
+
+<div class="cases-container">
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="isLoading" class="loading">Loading cases...</div>
+
+  <div *ngIf="!isLoading && (!caseParties || caseParties.length === 0)" class="empty">
+    No case parties found.
+  </div>
+
+  <!-- cases.html -->
+  <ng-container *ngIf="isLoading; else content">
+    <div class="loading">Loading…</div>
+  </ng-container>
+
+  <ng-template #content>
+    <div *ngIf="error" class="error">Error: {{ error | json }}</div>
+
+    <div *ngIf="!isLoading && (!caseParties || caseParties.length === 0)" class="empty">
+      No parties found for this case.
+    </div>
+
+    <ng-container *ngIf="caseData as case"
+                  class="case-panel"
+                  [class.accordian-border]="case">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header class="accordian-border">
+          <mat-panel-title>
+            Case #{{ case.caseNumber }}: {{ case.caseTitle || 'Untitled' }}
+          </mat-panel-title>
+          <mat-panel-description>
+            {{ case.practiceArea || case.matterType || 'No Practice Area' }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <!-- Case Details -->
+        <div>
+          <strong>CaseId:</strong> {{ case.caseId || '-' }}<br />
+          <strong>Status:</strong> {{ case.status || '-' }}<br />
+          <strong>Jurisdiction:</strong> {{ case.jurisdiction || '-' }}<br />
+          <strong>Court:</strong> {{ case.court || '-' }}<br />
+          <strong>Outcome:</strong> {{ case.outcome || '-' }}<br />
+          <strong>Settlement Amount:</strong>
+          {{ case.settlementAmount != null ? ('$' + case.settlementAmount) : '-' }}<br />
+          <strong>Created At:</strong> {{ case.caseCreatedAt | date:'short' }}<br />
+          <strong>Modified At:</strong> {{ case.caseModifiedAt || '-' }}<br />
+          <strong>Sealed:</strong> {{ case.isSealed ? 'Yes' : 'No' }}
+        </div>
+
+        <br />
+
+        <!-- Parties Accordion -->
+        <mat-accordion *ngIf="case.caseParties?.length">
+          <mat-expansion-panel *ngFor="let cp of case.caseParties; let i=index"
+                               class="case-panel"
+                               [class.accordian-border]="cp">
+            <!-- debugging -->
+            <!--<pre>{{ cp | json }}</pre>-->
+
+            <mat-expansion-panel-header class="accordian-border">
+              <mat-panel-title>
+                {{ cp.partyRole }} (Party ID: {{ cp.partyId }})
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ cp.isClient ? 'Client' : (cp.isAdverse ? 'Adverse' : 'Other') }}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div>
+              <strong>Representation Start:</strong> {{ cp.representationStartDate || '-' }}<br />
+              <strong>Representation End:</strong> {{ cp.representationEndDate || '-' }}<br />
+              <strong>Billing Responsibility:</strong> {{ cp.billingResponsibility || '-' }}<br />
+              <strong>Notes:</strong> {{ cp.notes || '-' }}<br />
+              <strong>Primary Contact:</strong> {{ cp.isPrimaryContact ? 'Yes' : 'No' }}<br />
+              <strong>Created At:</strong> {{ cp.createdAt | date:'short' }}<br />
+              <strong>Modified At:</strong> {{ cp.modifiedAt || '-' }}
+            </div>
+
+            <!-- Party Info (NESTED) -->
+            <div *ngIf="cp.party" style="margin-top:10px; padding-left:20px; border-left:2px solid #e0e0e0;">
+              <h4>Party Details</h4>
+              <div>
+                <strong>Type:</strong> {{ cp.party.partyType }}<br />
+                <strong>Display Name:</strong> {{ cp.party.displayName || '-' }}<br />
+                <!-- Name logic by type -->
+                <ng-container *ngIf="cp.party.partyType === 'Individual'">
+                  <strong>Full Name:</strong> {{ cp.party.givenName }} {{ cp.party.familyName }}
+                </ng-container>
+                <ng-container *ngIf="cp.party.partyType === 'Organization'">
+                  <strong>Organization:</strong> {{ cp.party.organizationName || '-' }}
+                </ng-container>
+                <br />
+                <strong>Email:</strong> {{ cp.party.email || '-' }}<br />
+                <strong>Phone:</strong> {{ cp.party.phone || '-' }}<br />
+                <strong>Address:</strong>
+                {{ cp.party.address1 || '-' }}
+                <span *ngIf="cp.party.address2">, {{ cp.party.address2 }}</span>,
+                {{ cp.party.city || '-' }}, {{ cp.party.stateProvince || '-' }},
+                {{ cp.party.country || '-' }} {{ cp.party.postalCode || '' }}
+                <br />
+                <strong>Archived:</strong> {{ cp.party.isArchived ? 'Yes' : 'No' }}<br />
+                <strong>Created At:</strong> {{ cp.party.createdAt | date:'short' }}<br />
+                <strong>Modified At:</strong> {{ cp.party.modifiedAt || '-' }}
+              </div>
+            </div>
+
+          </mat-expansion-panel>
+        </mat-accordion>
+
+        <div *ngIf="!case.caseParties?.length" style="margin-top:1rem;">
+          <em>No parties associated with this case.</em>
+        </div>
+
+      </mat-expansion-panel>
+    </ng-container>
+  </ng-template>
+</div>

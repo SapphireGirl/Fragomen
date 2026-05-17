@@ -2,6 +2,7 @@ using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Fragomen.UserAPI.Interfaces;
 using Fragomen.UserAPI.Repositories;
+using Fragomen.UserAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +11,9 @@ using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -64,6 +68,9 @@ if (!builder.Environment.IsDevelopment() && !string.IsNullOrEmpty(keyVaultName))
 var userDbConnectionString = builder.Configuration.GetConnectionString("UserAPIConnectionString");
 builder.Services.AddTransient<IDbConnection>(sp => new SqlConnection(userDbConnectionString));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICaseRepository, CaseRepository>();
+builder.Services.AddScoped<IPartyRepository, PartyRepository>();
+builder.Services.AddScoped<ICaseService, CaseService>();
 
 // Add CORS policy for local development (allow the client origin)
 builder.Services.AddCors(options =>

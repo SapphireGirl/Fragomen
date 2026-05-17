@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.37216.2
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11723.231 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fragomen.UserAPI", "Fragomen.UserAPI\Fragomen.UserAPI.csproj", "{89C88718-A579-415E-AD2A-F5213A1CDCE0}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Fragomen.Client", "Fragomen.Client\Fragomen.Client.esproj", "{A2A791E8-30AD-713C-B703-EADEA186AC3C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fragomen.Testing", "Fragomen.Testing\Fragomen.Testing.csproj", "{9A6F90C4-6FDF-437D-B343-A3E995A47A24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{A2A791E8-30AD-713C-B703-EADEA186AC3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2A791E8-30AD-713C-B703-EADEA186AC3C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A2A791E8-30AD-713C-B703-EADEA186AC3C}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{9A6F90C4-6FDF-437D-B343-A3E995A47A24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A6F90C4-6FDF-437D-B343-A3E995A47A24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A6F90C4-6FDF-437D-B343-A3E995A47A24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A6F90C4-6FDF-437D-B343-A3E995A47A24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { HttpClient } from '@angular/common/http';
+import { Router, ActivatedRoute } from '@angular/router'; 
 
 interface User {
   id: number;
@@ -23,7 +24,7 @@ export class Users implements OnInit {
   isLoading = false;
   errorMessage = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
     this.fetchUsers();
@@ -46,4 +47,6 @@ export class Users implements OnInit {
       },
     });
   }
+
+  goToCase() { this.router.navigate(['/cases']); }
 }
