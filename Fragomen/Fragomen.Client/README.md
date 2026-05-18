@@ -2,6 +2,14 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.2.
 
+## Generics: Reason to use
+Generics allow you to write type-agnostic code
+
+Type Safety: Catch errors at compile time, not runtime.
+Code Reuse: Write once, use with any type.
+Performance: No boxing/unboxing, as with object.
+Flexibility: You can make things like repositories, data structures, and services reusable.
+
 ## Development server
 
 To start a local development server, run:
