@@ -6,7 +6,7 @@ using System.Data;
 
 namespace Fragomen.UserAPI.Repositories
 {
-    public class CaseRepository : ICaseRepository
+    public class CaseRepository : IGenericRepository<Case>, ICaseRepository
     {
         private readonly IDbConnection _connection;
         private readonly ILogger<CaseRepository> _logger;
@@ -136,6 +136,21 @@ namespace Fragomen.UserAPI.Repositories
                 throw;
             }
             
+        }
+
+        public Task<Case> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Case>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Case> AddAsync(Case entity, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
     }
 }
