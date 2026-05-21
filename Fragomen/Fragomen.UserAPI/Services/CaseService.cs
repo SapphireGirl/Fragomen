@@ -1,17 +1,16 @@
-﻿namespace Fragomen.UserAPI.Services
-{
-    using Fragomen.UserAPI.Interfaces;
-    using Fragomen.UserAPI.Models;
-    using Microsoft.Extensions.Logging;
+﻿using Fragomen.UserAPI.Interfaces;
+using Fragomen.UserAPI.Models;
+using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
 
-    public class CaseService : ICaseService
+namespace Fragomen.UserAPI.Services
+{
+    public class CaseService : CaseServiceBase, ICaseService
     {
-        private readonly ICaseRepository _caseRepository;
         private readonly ILogger<CaseService> _logger;
 
-        public CaseService(ICaseRepository caseRepository, ILogger<CaseService> logger)
+        public CaseService(ICaseRepository caseRepository, ILogger<CaseService> logger) : base(caseRepository)
         {
-            _caseRepository = caseRepository;
             _logger = logger;
         }
 
@@ -25,10 +24,7 @@
             {
                 _logger.LogWarning("No case found for ID {CaseId}", caseId);
             }
-            else
-            {
-                _logger.LogInformation("Retrieved case: {CaseNumber}, with {PartyCount} parties", caseDetails.CaseNumber, caseDetails.CaseParties?.Count ?? 0);
-            }
+            
 
             // Business logic example: mark case as high-value if it has a settlement amount > $1M
             if (caseDetails?.SettlementAmount > 1_000_000)
@@ -37,6 +33,45 @@
             }
 
             return caseDetails;
+        }
+
+        public override List<(string StateProvince, List<Party> Parties, int Count)> GroupPartiesByStateProvince(Case caseDetails)
+        {
+            if (caseDetails == null || caseDetails.CaseParties == null)
+                return new List<(string, List<Party>, int)>();
+
+            var partiesByStateProvince = caseDetails.CaseParties
+                    .Select(cp => cp.Party)
+                    .Where(p => p is not null && !string.IsNullOrWhiteSpace(p.StateProvince))
+                    .GroupBy(p => p!.StateProvince!)
+                    .Select(g => (
+                        StateProvince: g.Key!,                     // string (never null after filter)
+                        Parties: g.Select(p => p!).ToList(),       // List<Party> (never null)
+                        Count: g.Count()
+                    ))
+                    .ToList();
+
+            return partiesByStateProvince;
+        }
+
+        public async Task<List<(string StateProvince, List<Party> Parties, int Count)>> GetGroupByForCaseDetails(int caseId, CancellationToken cancellationToken = default)
+        {
+            var groupByDetails = new List<(string StateProvince, List<Party> Parties, int Count)>();
+            try
+            {
+                var cssDetails = await _caseRepository.GetCase_PartiesByCaseIdAsync(caseId, cancellationToken);
+                if (cssDetails != null)
+                {
+                    groupByDetails = GroupPartiesByStateProvince(cssDetails);
+                    return groupByDetails;
+                }
+
+                return groupByDetails;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task<bool> ValidateStatusChangeAsync(int caseId, string newStatus, CancellationToken cancellationToken = default)
@@ -106,6 +141,27 @@
 
             await _caseRepository.UpdateCaseStatusAsync(caseId, newStatus, cancellationToken);
             return await Task.FromResult(true);
+
+        }
+
+        public override async Task<Case?> GetCaseAsync(int caseId, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var caseDetails = await _caseRepository.GetCase_PartiesByCaseIdAsync(caseId, cancellationToken);
+                if (caseDetails == null)
+                {
+                    _logger.LogWarning("No case found for ID {CaseId}", caseId);
+                    return null;
+                }
+                return caseDetails;
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving case details for case ID {CaseId}", caseId);
+                throw;
+            }
 
         }
     }
