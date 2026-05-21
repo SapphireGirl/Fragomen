@@ -9,9 +9,9 @@ namespace Fragomen.UserAPI.Repositories
     public class PartyRepository : IPartyRepository
     {
         private readonly IDbConnection _connection;
-        private readonly ILogger<UserRepository> _logger;
+        private readonly ILogger<UsersRepository> _logger;
 
-        public PartyRepository(IDbConnection connection, ILogger<UserRepository> logger)
+        public PartyRepository(IDbConnection connection, ILogger<UsersRepository> logger)
         {
             _connection = connection;
             _logger = logger;

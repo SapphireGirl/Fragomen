@@ -1,4 +1,5 @@
-﻿using Fragomen.UserAPI.Interfaces;
+﻿using Fragomen.UserAPI.Enums;
+using Fragomen.UserAPI.Interfaces;
 using Fragomen.UserAPI.Models;
 using Fragomen.UserAPI.Services;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,9 @@ namespace Fragomen.Testing
     {
         private Mock<ICaseRepository> _repositoryMock;
         private Mock<ILogger<CaseService>> _loggerMock;
+        private Mock<ICaseStatusTransitionPolicy> _caseStatusTransitionPolicyMock;
+        private Mock<IUserPermissionService> _userPermissionServiceMock;
+
         private CaseService _sutCaseService;
 
         [SetUp]
@@ -19,7 +23,9 @@ namespace Fragomen.Testing
         {
             _repositoryMock = new Mock<ICaseRepository>();
             _loggerMock = new Mock<ILogger<CaseService>>();
-            _sutCaseService = new CaseService(_repositoryMock.Object, _loggerMock.Object);
+            _caseStatusTransitionPolicyMock = new Mock<ICaseStatusTransitionPolicy>();
+            _userPermissionServiceMock = new Mock<IUserPermissionService>();
+            _sutCaseService = new CaseService(_repositoryMock.Object, _loggerMock.Object, _caseStatusTransitionPolicyMock.Object, _userPermissionServiceMock.Object);
         }
 
         [Test]
@@ -113,7 +119,7 @@ namespace Fragomen.Testing
                 .ReturnsAsync(caseObj);
 
             // Now construct the SUT
-            _sutCaseService = new CaseService(_repositoryMock.Object, _loggerMock.Object);
+            _sutCaseService = new CaseService(_repositoryMock.Object, _loggerMock.Object, _caseStatusTransitionPolicyMock.Object, _userPermissionServiceMock.Object);
 
             // Act
             var result = await _sutCaseService.GetGroupByForCaseDetails(1, CancellationToken.None);
@@ -140,10 +146,14 @@ namespace Fragomen.Testing
             var newStatus = "Active";
 
             _repositoryMock.Setup(r => r.GetCaseStatus(caseId, It.IsAny<CancellationToken>()))
-                           .ReturnsAsync(new Case { Status = "intake" });
+                           .ReturnsAsync(new Case { Status = "Intake" });
+            _caseStatusTransitionPolicyMock.Setup(r => r.CanTransition(It.IsAny<CaseStatus>(), It.IsAny<CaseStatus>(), It.IsAny<bool>()))
+                           .Returns(true);
+            _userPermissionServiceMock.Setup(u => u.HasOverridePermissionAsync(It.IsAny<Users>(), It.IsAny<int>()))
+                .ReturnsAsync(true);
 
             // Act
-            var validationResult = _sutCaseService.ValidateStatusChangeAsync(caseId, newStatus);
+            var validationResult = _sutCaseService.ValidateStatusChangeAsync(caseId, newStatus, null, CancellationToken.None);
 
             // Assert
             Assert.That(validationResult.Result, Is.True);
@@ -161,7 +171,7 @@ namespace Fragomen.Testing
 
             // act
             // System Under Test: CaseService.ValidateStatusChangeAsync
-            var validationResult = _sutCaseService.ValidateStatusChangeAsync(caseId, newStatus);
+            var validationResult = _sutCaseService.ValidateStatusChangeAsync(caseId, newStatus, null, CancellationToken.None);
 
             // Assert
             Assert.That(validationResult.Result, Is.False);
