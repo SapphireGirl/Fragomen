@@ -145,10 +145,34 @@ namespace Fragomen.UserAPI.Repositories
 
         public Task<IEnumerable<Case>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            Case[] cases = new[]
+            {
+                new Case{CaseId = 1, Court = "District" },
+                new Case {CaseId = 2, Court = "Supreme"},
+                new Case {CaseId = 3, Court = "Appellate"}
+            };
+
+            Dictionary<int, Case> caseDictionary= new Dictionary<int, Case>();
+            if (caseDictionary.ContainsKey(1))
+            {
+                var existingCase = caseDictionary[1];
+                existingCase.CaseParties.Add(new CaseParty { CasePartyId = 1, CaseId = 1, PartyId = 1, Role = "Plaintiff" });
+
+            }
+            else
+            {
+                var newCase = new Case { CaseId = 1, Court = "District", CaseParties = new List<CaseParty> { new CaseParty { CasePartyId = 1, CaseId = 1, PartyId = 1, Role = "Plaintiff" } } };
+                caseDictionary.Add(1, newCase);
+            }
+            return Task.FromResult<IEnumerable<Case>>(cases);
         }
 
         public Task<Case> AddAsync(Case entity, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Case> GetCaseByIdAsync(int caseId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
