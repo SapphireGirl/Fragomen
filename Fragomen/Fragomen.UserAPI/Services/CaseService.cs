@@ -1,4 +1,5 @@
-﻿using Fragomen.UserAPI.Interfaces;
+﻿using Fragomen.UserAPI.Enums;
+using Fragomen.UserAPI.Interfaces;
 using Fragomen.UserAPI.Models;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
@@ -8,10 +9,17 @@ namespace Fragomen.UserAPI.Services
     public class CaseService : CaseServiceBase, ICaseService
     {
         private readonly ILogger<CaseService> _logger;
+        private readonly ICaseStatusTransitionPolicy _caseStatusTransitionPolicy;
+        private readonly IUserPermissionService _userPermissionService;
 
-        public CaseService(ICaseRepository caseRepository, ILogger<CaseService> logger) : base(caseRepository)
+        public CaseService(ICaseRepository caseRepository, 
+                           ILogger<CaseService> logger,
+                           ICaseStatusTransitionPolicy caseStatusTransitionPolicy,
+                           IUserPermissionService userPermissionService) : base(caseRepository)
         {
             _logger = logger;
+            _caseStatusTransitionPolicy = caseStatusTransitionPolicy;
+            _userPermissionService = userPermissionService;
         }
 
         public async Task<Case> GetCaseDetailsAsync(int caseId, CancellationToken cancellationToken = default)
@@ -74,64 +82,34 @@ namespace Fragomen.UserAPI.Services
             }
         }
 
-        public async Task<bool> ValidateStatusChangeAsync(int caseId, string newStatus, CancellationToken cancellationToken = default)
+        public async Task<bool> ValidateStatusChangeAsync(
+            int caseId, string newStatus, Users currentUser, CancellationToken cancellationToken = default)
         {
-            try
+            var myCase = await _caseRepository.GetCaseStatus(caseId, cancellationToken);
+
+            if (!Enum.TryParse<CaseStatus>(myCase.Status, true, out var currentStatus))
             {
-                // validation rules: intake -> active, active -> pending/closed, pending -> active/closed, closed -> no changes
-                var myCase = await _caseRepository.GetCaseStatus(caseId, cancellationToken);
-
-                switch (myCase.Status)
-                {
-                    case "intake":
-                        // intake can only move to active
-                        if (!newStatus.Equals("active", StringComparison.OrdinalIgnoreCase))
-                        {
-                            _logger.LogWarning("Invalid status change from {CurrentStatus} to {NewStatus} for case ID {CaseId}", myCase.Status, newStatus, caseId);
-                            return false;
-                        }
-                        return newStatus.Equals("active", StringComparison.OrdinalIgnoreCase);
-
-                    case "active":
-                        // active can only move to pending or closed
-                        if (!newStatus.Equals("pending", StringComparison.OrdinalIgnoreCase) || !newStatus.Equals("closed", StringComparison.OrdinalIgnoreCase))
-                        {
-                            _logger.LogWarning("Invalid status change from {CurrentStatus} to {NewStatus} for case ID {CaseId}", myCase.Status, newStatus, caseId);
-                            return false;
-                        }
-                        return true; // both pending and closed are valid
-
-                    case "pending":
-                        // pending can only move to active or closed
-                        if (!newStatus.Equals("active", StringComparison.OrdinalIgnoreCase) && !newStatus.Equals("closed", StringComparison.OrdinalIgnoreCase))
-                        {
-                            _logger.LogWarning("Invalid status change from {CurrentStatus} to {NewStatus} for case ID {CaseId}", myCase.Status, newStatus, caseId);
-                            return false;
-                        }
-                        return true; // both active and closed are valid
-
-                    case "closed":
-                        return false; // no changes allowed from closed
-
-                    default:
-                        _logger.LogWarning("Unknown current status {CurrentStatus} for case ID {CaseId}", myCase.Status, caseId);
-                        return false;
-                }
-
-
-
-
+                _logger.LogWarning("Invalid current status {CurrentStatus} for case ID {CaseId}", myCase.Status, caseId);
+                return false;
             }
-            catch (Exception ex)
+            if (!Enum.TryParse<CaseStatus>(newStatus, true, out var newCaseStatus))
             {
-                _logger.LogError(ex, "Error validating status change for case ID {CaseId} to new status {NewStatus}", caseId, newStatus);
-                throw;
+                _logger.LogWarning("Invalid new status {NewStatus} for case ID {CaseId}", newStatus, caseId);
+                return false;
             }
+
+            var hasOverride = await _userPermissionService.HasOverridePermissionAsync(currentUser, caseId);
+
+            var allowed = _caseStatusTransitionPolicy.CanTransition(currentStatus, newCaseStatus, hasOverride);
+            if (!allowed)
+                _logger.LogWarning("Invalid status transition: {CurrentStatus} → {NewStatus} [Override? {HasOverride}] on Case {CaseId}",
+                    currentStatus, newCaseStatus, hasOverride, caseId);
+
+            return allowed;
         }
-
         public async Task<bool> UpdateCaseStatusAsync(int caseId, string newStatus, CancellationToken cancellationToken = default)
         {
-            var isValid = await ValidateStatusChangeAsync(caseId, newStatus, cancellationToken);
+            var isValid = await ValidateStatusChangeAsync(caseId, newStatus, null, cancellationToken);
 
             if (!isValid)
             {

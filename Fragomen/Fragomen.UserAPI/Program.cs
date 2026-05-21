@@ -67,10 +67,12 @@ if (!builder.Environment.IsDevelopment() && !string.IsNullOrEmpty(keyVaultName))
 // - appsettings.Development.json for local development
 var userDbConnectionString = builder.Configuration.GetConnectionString("UserAPIConnectionString");
 builder.Services.AddTransient<IDbConnection>(sp => new SqlConnection(userDbConnectionString));
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRepository, UsersRepository>();
 builder.Services.AddScoped<ICaseRepository, CaseRepository>();
 builder.Services.AddScoped<IPartyRepository, PartyRepository>();
 builder.Services.AddScoped<ICaseService, CaseService>();
+builder.Services.AddScoped<ICaseStatusTransitionPolicy, CaseStatusTransitionPolicy>();
+builder.Services.AddScoped<IUserPermissionService, UserPermissionService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 // Add CORS policy for local development (allow the client origin)

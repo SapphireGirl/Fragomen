@@ -24,7 +24,7 @@ namespace Fragomen.UserAPI.Controllers
 
         [AllowAnonymous]
         [HttpGet("GetAllUsers")]
-        public async Task<IEnumerable<User>> GetAllUsers()
+        public async Task<IEnumerable<Users>> GetAllUsers()
         {
             try
             {
@@ -34,7 +34,7 @@ namespace Fragomen.UserAPI.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"UserController: ERROR GetAllUsers failed {ex.Message}");
-                return new List<User>();
+                return new List<Users>();
             }
         }
 

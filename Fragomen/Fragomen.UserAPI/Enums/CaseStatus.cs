@@ -5,6 +5,7 @@
         Intake,
         Active,
         Pending,
-        Closed
+        Closed,
+        Suspended
     }
 }
